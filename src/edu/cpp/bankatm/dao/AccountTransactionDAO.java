@@ -1,4 +1,4 @@
-package dao;
+package edu.cpp.bankatm.dao;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -18,6 +18,7 @@ public class AccountTransactionDAO {
         this.amount = amount;
         this.dateTime = dateTime;
     }
+
     /*
      * Create a new record in the DB for an AccountTransaction
      * Also create a record in TransactionDetails
@@ -42,6 +43,7 @@ public class AccountTransactionDAO {
             e.printStackTrace();
         }
     }
+
     /*
      * Fetch a transaction form the DB and return an AccountTransaction object
      * */
@@ -50,28 +52,34 @@ public class AccountTransactionDAO {
             PreparedStatement preparedStatement = DB.getConnection().prepareStatement("SELECT * FROM AccountTransaction WHERE TransactionID = ?");
             preparedStatement.setInt(1, transactionID);
             ResultSet resultSet = preparedStatement.executeQuery();
-            int Amount = resultSet.getInt("Amount");
-            Date DateTime = new java.util.Date(resultSet.getDate("Datetime").getTime());
-            preparedStatement.close();
-            resultSet.close();
-            AccountTransactionDAO accountTransactionDAO = new AccountTransactionDAO(transactionID, Amount, DateTime);
+            if (resultSet.next()) {
+                int Amount = resultSet.getInt("Amount");
+                Date DateTime = new java.util.Date(resultSet.getDate("Datetime").getTime());
+                preparedStatement.close();
+                resultSet.close();
+                AccountTransactionDAO accountTransactionDAO = new AccountTransactionDAO(transactionID, Amount, DateTime);
 
-            preparedStatement = DB.getConnection().prepareStatement("SELECT * FROM TransactionDetails WHERE TransactionID = ?");
-            preparedStatement.setInt(1, transactionID);
+                preparedStatement = DB.getConnection().prepareStatement("SELECT * FROM TransactionDetails WHERE TransactionID = ?");
+                preparedStatement.setInt(1, transactionID);
 
-            int toAccountID = resultSet.getInt("toAccountID");
-            int fromAccountID = resultSet.getInt("fromAccountID");
-            accountTransactionDAO.setFromAccount(fromAccountID);
-            accountTransactionDAO.setToAccount(toAccountID);
+                int toAccountID = resultSet.getInt("toAccountID");
+                int fromAccountID = resultSet.getInt("fromAccountID");
+                accountTransactionDAO.setFromAccount(fromAccountID);
+                accountTransactionDAO.setToAccount(toAccountID);
 
-            preparedStatement.close();
-            resultSet.close();
-            return accountTransactionDAO;
+                preparedStatement.close();
+                resultSet.close();
+                return accountTransactionDAO;
+            } else {
+                resultSet.close();
+                return null;
+            }
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
     }
+
     /*
      * Update the DB entries for an AccountTransaction object if its contents has changed
      * */
@@ -94,6 +102,7 @@ public class AccountTransactionDAO {
             e.printStackTrace();
         }
     }
+
     /*
      * Remove a transaction and its details from the DB
      * */
@@ -114,8 +123,8 @@ public class AccountTransactionDAO {
     }
 
     /*
-    * Fetch all transactions on an account in the DB
-    * */
+     * Fetch all transactions on an account in the DB
+     * */
     public static List<AccountTransactionDAO> getTransactions(int accountNum) {
         List<AccountTransactionDAO> list = new ArrayList<>();
         try {
@@ -148,6 +157,7 @@ public class AccountTransactionDAO {
 
     public void setToAccount(int toAccount) {
         this.toAccount = toAccount;
+        update();
     }
 
     public int getFromAccount() {
@@ -156,6 +166,7 @@ public class AccountTransactionDAO {
 
     public void setFromAccount(int fromAccount) {
         this.fromAccount = fromAccount;
+        update();
     }
 
     public int getTransactionID() {
@@ -168,6 +179,7 @@ public class AccountTransactionDAO {
 
     public void setAmount(int amount) {
         this.amount = amount;
+        update();
     }
 
     public Date getDateTime() {
@@ -176,5 +188,6 @@ public class AccountTransactionDAO {
 
     public void setDateTime(Date dateTime) {
         this.dateTime = dateTime;
+        update();
     }
 }

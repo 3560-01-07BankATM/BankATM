@@ -117,7 +117,6 @@
       <SubComponents>
         <Component class="javax.swing.JTextField" name="usernameField">
           <Properties>
-            <Property name="toolTipText" type="java.lang.String" value="enter &apos;1234&apos; as card number"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="usernameFieldActionPerformed"/>
@@ -135,7 +134,6 @@
         </Component>
         <Component class="javax.swing.JPasswordField" name="passwordField">
           <Properties>
-            <Property name="toolTipText" type="java.lang.String" value="enter &apos;4321&apos; as pin number"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="passwordFieldActionPerformed"/>

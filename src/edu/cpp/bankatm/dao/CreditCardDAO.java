@@ -1,4 +1,4 @@
-package dao;
+package edu.cpp.bankatm.dao;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -25,6 +25,7 @@ public class CreditCardDAO {
         this.creditLimit = creditLimit;
         this.creditUsed = creditUsed;
     }
+
     /*
      * Create a new record in the DB for a CreditCardDAO
      * */
@@ -43,6 +44,7 @@ public class CreditCardDAO {
             e.printStackTrace();
         }
     }
+
     /*
      * Fetch a credit card record form the DB and return a CreditCardDAO object
      * */
@@ -51,28 +53,35 @@ public class CreditCardDAO {
             PreparedStatement preparedStatement = DB.getConnection().prepareStatement("SELECT * FROM CreditCards WHERE CardNum = ?");
             preparedStatement.setString(1, CardNum);
             ResultSet resultSet = preparedStatement.executeQuery();
-            AccountDAO accountDAO = AccountDAO.report(resultSet.getInt("AccountID"));
-            int fee = resultSet.getInt("fee");
-            String cvv = resultSet.getString("cvv");
-            boolean chipAndPin = resultSet.getBoolean("chipAndPin");
-            java.sql.Date expirationDate = resultSet.getDate("expirationDate");
-            int creditLimit = resultSet.getInt("creditLimit");
-            int creditUsed = resultSet.getInt("creditUsed");
-            return new CreditCardDAO(
-                    CardNum,
-                    accountDAO,
-                    fee,
-                    new Date(expirationDate.getTime()),
-                    cvv,
-                    chipAndPin,
-                    creditLimit,
-                    creditUsed
-            );
+            if (resultSet.next()) {
+                AccountDAO accountDAO = AccountDAO.report(resultSet.getInt("AccountID"));
+                int fee = resultSet.getInt("fee");
+                String cvv = resultSet.getString("cvv");
+                boolean chipAndPin = resultSet.getBoolean("chipAndPin");
+                java.sql.Date expirationDate = resultSet.getDate("expirationDate");
+                int creditLimit = resultSet.getInt("creditLimit");
+                int creditUsed = resultSet.getInt("creditUsed");
+                resultSet.close();
+                return new CreditCardDAO(
+                        CardNum,
+                        accountDAO,
+                        fee,
+                        new Date(expirationDate.getTime()),
+                        cvv,
+                        chipAndPin,
+                        creditLimit,
+                        creditUsed
+                );
+            } else {
+                resultSet.close();
+                return null;
+            }
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
     }
+
     /*
      * Update the DB entry for a CreditCardDAO object if its contents has changed
      * */
@@ -92,6 +101,7 @@ public class CreditCardDAO {
             e.printStackTrace();
         }
     }
+
     /*
      * Remove a credit card from the DB
      * */

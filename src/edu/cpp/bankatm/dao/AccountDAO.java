@@ -1,4 +1,4 @@
-package dao;
+package edu.cpp.bankatm.dao;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -20,8 +20,8 @@ public class AccountDAO {
     }
 
     /*
-    * Create a new record in the DB for an Account
-    * */
+     * Create a new record in the DB for an Account
+     * */
     public void create() {
         try {
             PreparedStatement preparedStatement = DB.getConnection().prepareStatement("INSERT INTO Accounts (CustomerID, `Type`, Balance, OverdraftProtected) VALUES (?,?,?,?)");
@@ -36,24 +36,29 @@ public class AccountDAO {
     }
 
     /*
-    * Fetch an account form the DB and return an AccountDAO object
-    * */
+     * Fetch an account form the DB and return an AccountDAO object
+     * */
     public static AccountDAO report(int accountNum) {
         try {
             PreparedStatement preparedStatement = DB.getConnection().prepareStatement("SELECT * FROM Accounts WHERE AccountNum = ?");
             preparedStatement.setInt(1, accountNum);
             ResultSet resultSet = preparedStatement.executeQuery();
-            CustomerDAO customerDAO = CustomerDAO.report(resultSet.getInt("CustomerID"));
-            String Type = resultSet.getString("Type");
-            int Balance = resultSet.getInt("Balance");
-            boolean OverdraftProtected = resultSet.getBoolean("OverdraftProtected");
-            return new AccountDAO(
-                    accountNum,
-                    customerDAO,
-                    Type,
-                    Balance,
-                    OverdraftProtected
-            );
+            if (resultSet.next()) {
+                CustomerDAO customerDAO = CustomerDAO.report(resultSet.getInt("CustomerID"));
+                String Type = resultSet.getString("Type");
+                int Balance = resultSet.getInt("Balance");
+                boolean OverdraftProtected = resultSet.getBoolean("OverdraftProtected");
+                return new AccountDAO(
+                        accountNum,
+                        customerDAO,
+                        Type,
+                        Balance,
+                        OverdraftProtected
+                );
+            } else {
+                resultSet.close();
+                return null;
+            }
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -61,8 +66,8 @@ public class AccountDAO {
     }
 
     /*
-    * Update the DB entry for an AccountDAO object if its contents has changed
-    * */
+     * Update the DB entry for an AccountDAO object if its contents has changed
+     * */
     public void update() {
         try {
             PreparedStatement preparedStatement = DB.getConnection().prepareStatement("UPDATE Accounts SET `CustomerID` = ?, `Type` = ?, Balance = ?, OverdraftProtected = ? WHERE AccountNum = ?");
@@ -78,8 +83,8 @@ public class AccountDAO {
     }
 
     /*
-    * Remove an account from the DB
-    * */
+     * Remove an account from the DB
+     * */
     public void delete() {
         try {
             PreparedStatement preparedStatement = DB.getConnection().prepareStatement("DELETE FROM Accounts WHERE AccountNum = ?");
@@ -91,8 +96,8 @@ public class AccountDAO {
     }
 
     /*
-    * Fetch all transactions for an account in the DB
-    * */
+     * Fetch all transactions for an account in the DB
+     * */
     public List<AccountTransactionDAO> getTransactions() {
         return AccountTransactionDAO.getTransactions(accountNum);
     }

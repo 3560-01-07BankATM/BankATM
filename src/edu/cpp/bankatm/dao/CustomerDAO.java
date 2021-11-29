@@ -1,4 +1,4 @@
-package dao;
+package edu.cpp.bankatm.dao;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -41,17 +41,22 @@ public class CustomerDAO {
             PreparedStatement preparedStatement = DB.getConnection().prepareStatement("SELECT * FROM Customers WHERE CustomerID = ?");
             preparedStatement.setInt(1, CustomerID);
             ResultSet resultSet = preparedStatement.executeQuery();
-            String Name = resultSet.getString("Name");
-            String PhysicalAddress = resultSet.getString("PhysicalAddress");
-            String PhoneNumber = resultSet.getString("PhoneNumber");
-            String EmailAddress = resultSet.getString("EmailAddress");
-            return new CustomerDAO(
-                    CustomerID,
-                    Name,
-                    PhysicalAddress,
-                    PhoneNumber,
-                    EmailAddress
-            );
+            if(resultSet.next()) {
+                String Name = resultSet.getString("Name");
+                String PhysicalAddress = resultSet.getString("PhysicalAddress");
+                String PhoneNumber = resultSet.getString("PhoneNumber");
+                String EmailAddress = resultSet.getString("EmailAddress");
+                return new CustomerDAO(
+                        CustomerID,
+                        Name,
+                        PhysicalAddress,
+                        PhoneNumber,
+                        EmailAddress
+                );
+            } else {
+                resultSet.close();
+                return null;
+            }
         } catch (Exception e) {
             e.printStackTrace();
             return null;

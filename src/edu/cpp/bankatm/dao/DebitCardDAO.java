@@ -1,4 +1,4 @@
-package dao;
+package edu.cpp.bankatm.dao;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -11,15 +11,52 @@ public class DebitCardDAO {
     private Date expirationDate;
     private String cvv;
     private boolean chipAndPin;
+    private String pin;
 
-    public DebitCardDAO(String cardNum, AccountDAO accountDAO, int fee, Date expirationDate, String cvv, boolean chipAndPin) {
+    public DebitCardDAO(String cardNum, AccountDAO accountDAO, int fee, Date expirationDate, String cvv, boolean chipAndPin, String pin) {
         CardNum = cardNum;
         this.accountDAO = accountDAO;
         this.fee = fee;
         this.expirationDate = expirationDate;
         this.cvv = cvv;
         this.chipAndPin = chipAndPin;
+        this.pin = pin;
     }
+
+    /*
+     * Fetch a debit card form the DB and return an DebitCardDAO object
+     * */
+    public static DebitCardDAO report(String CardNum) {
+        try {
+            PreparedStatement preparedStatement = DB.getConnection().prepareStatement("SELECT * FROM DebitCards WHERE CardNum = ?");
+            preparedStatement.setString(1, CardNum);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                AccountDAO accountDAO = AccountDAO.report(resultSet.getInt("AccountID"));
+                int fee = resultSet.getInt("fee");
+                String cvv = resultSet.getString("cvv");
+                boolean chipAndPin = resultSet.getBoolean("chipAndPin");
+                java.sql.Date expirationDate = resultSet.getDate("expirationDate");
+                String pin = resultSet.getString("pin");
+                return new DebitCardDAO(
+                        CardNum,
+                        accountDAO,
+                        fee,
+                        new java.util.Date(expirationDate.getTime()),
+                        cvv,
+                        chipAndPin,
+                        pin
+                );
+            } else {
+                resultSet.close();
+                return null;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     /*
      * Create a new record in the DB for a DebitCard
      * */
@@ -36,49 +73,26 @@ public class DebitCardDAO {
             e.printStackTrace();
         }
     }
-    /*
-     * Fetch a debit card form the DB and return an DebitCardDAO object
-     * */
-    public static DebitCardDAO report(String CardNum) {
-        try {
-            PreparedStatement preparedStatement = DB.getConnection().prepareStatement("SELECT * FROM DebitCards WHERE CardNum = ?");
-            preparedStatement.setString(1, CardNum);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            AccountDAO accountDAO = AccountDAO.report(resultSet.getInt("AccountID"));
-            int fee = resultSet.getInt("fee");
-            String cvv = resultSet.getString("cvv");
-            boolean chipAndPin = resultSet.getBoolean("chipAndPin");
-            java.sql.Date expirationDate = resultSet.getDate("expirationDate");
-            return new DebitCardDAO(
-                    CardNum,
-                    accountDAO,
-                    fee,
-                    new java.util.Date(expirationDate.getTime()),
-                    cvv,
-                    chipAndPin
-            );
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
+
     /*
      * Update the DB entry for an DebitCardDAO object if its contents has changed
      * */
     public void update() {
         try {
-            PreparedStatement preparedStatement = DB.getConnection().prepareStatement("UPDATE DebitCards SET AccountID = ?, fee = ?, expirationDate = ?, cvv = ?, chipAndPin = ? WHERE CardNum = ?");
+            PreparedStatement preparedStatement = DB.getConnection().prepareStatement("UPDATE DebitCards SET AccountID = ?, fee = ?, expirationDate = ?, cvv = ?, chipAndPin = ?, pin = ? WHERE CardNum = ?");
             preparedStatement.setInt(1, accountDAO.getAccountNum());
             preparedStatement.setInt(2, fee);
             preparedStatement.setDate(3, new java.sql.Date(expirationDate.getTime()));
             preparedStatement.setString(4, cvv);
             preparedStatement.setBoolean(5, chipAndPin);
-            preparedStatement.setString(6, CardNum);
+            preparedStatement.setString(6, pin);
+            preparedStatement.setString(7, CardNum);
             preparedStatement.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
     /*
      * Remove a debit card from the DB
      * */
@@ -133,6 +147,15 @@ public class DebitCardDAO {
 
     public void setChipAndPin(boolean chipAndPin) {
         this.chipAndPin = chipAndPin;
+        update();
+    }
+
+    public String getPin() {
+        return pin;
+    }
+
+    public void setPin(String pin) {
+        this.pin = pin;
         update();
     }
 }
