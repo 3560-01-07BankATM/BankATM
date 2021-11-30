@@ -126,10 +126,7 @@ public class CustomWithdrawalScreen extends javax.swing.JFrame {
     }//GEN-LAST:event_completeWithdrawalButtonActionPerformed
 
     private void backToMenuButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backToMenuButton3ActionPerformed
-        Controller.backButton(this);
-        
-        //new MenuScreen().setVisible(true);  //will return to main menu and dispose of current screen
-        //dispose();
+        Controller.backButton(this); //will return to the main menu and dispose of current screen
     }//GEN-LAST:event_backToMenuButton3ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

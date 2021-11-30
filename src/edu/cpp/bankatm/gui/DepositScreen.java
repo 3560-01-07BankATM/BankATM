@@ -185,10 +185,7 @@ public class DepositScreen extends javax.swing.JFrame {
 
     private void backToMenuButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backToMenuButton1ActionPerformed
         // TODO add your handling code here:
-        Controller.backButton(this);
-        
-        //new MenuScreen().setVisible(true);  //will return to menu and dispose of current screen
-        //dispose();
+        Controller.backButton(this); //will return to the main menu and dispose of current screen
     }//GEN-LAST:event_backToMenuButton1ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
