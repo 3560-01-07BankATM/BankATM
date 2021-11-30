@@ -141,5 +141,45 @@ public class Controller {
         );
 
         toAccount.setBalance(toAccount.getBalance() + amount);
+
+        // go back to main menu
+        var menu = new MenuScreen();
+        menu.setAccountBalance(activeCard.getAccountDAO().getBalance());
+        menu.setVisible(true);
+        transferFundsScreen.dispose();
     }
+
+    public static void backButton(DepositScreen depositScreen) {
+        // go back to main menu
+        var menu = new MenuScreen();
+        menu.setAccountBalance(activeCard.getAccountDAO().getBalance());
+        menu.setVisible(true);
+        depositScreen.dispose();
+    }
+
+    public static void backButton(FastWithdrawScreen fastWithdrawScreen) {
+        // go back to main menu
+        var menu = new MenuScreen();
+        menu.setAccountBalance(activeCard.getAccountDAO().getBalance());
+        menu.setVisible(true);
+        fastWithdrawScreen.dispose();
+    }
+
+    public static void backButton(CustomWithdrawalScreen customWithdrawalScreen) {
+        // go back to main menu
+        var menu = new MenuScreen();
+        menu.setAccountBalance(activeCard.getAccountDAO().getBalance());
+        menu.setVisible(true);
+        customWithdrawalScreen.dispose();   
+    }
+
+    public static void backButton(TransferFundsScreen transferFundsScreen) {
+        // go back to main menu
+        var menu = new MenuScreen();
+        menu.setAccountBalance(activeCard.getAccountDAO().getBalance());
+        menu.setVisible(true);
+        transferFundsScreen.dispose();
+    }
+
+
 }
