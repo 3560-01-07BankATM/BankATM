@@ -135,14 +135,11 @@ public class TransferFundsScreen extends javax.swing.JFrame {
 
     private void completeTransferButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_completeTransferButtonActionPerformed
         Controller.transfer(this);
-        new MenuScreen().setVisible(true);  //will return to menu screen and dispose of current screen
-        dispose();
     }//GEN-LAST:event_completeTransferButtonActionPerformed
 
     private void backToMenuButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backToMenuButton4ActionPerformed
         // TODO add your handling code here:
-        new MenuScreen().setVisible(true);  //will return to menu screen and dispose of current screen
-        dispose();
+        Controller.backButton(this); //will return to the main menu and dispose of current screen
     }//GEN-LAST:event_backToMenuButton4ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

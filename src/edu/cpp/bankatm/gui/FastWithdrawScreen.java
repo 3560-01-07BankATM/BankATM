@@ -200,8 +200,7 @@ public class FastWithdrawScreen extends javax.swing.JFrame {
     }//GEN-LAST:event_hundredButtonActionPerformed
 
     private void backToMenuButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backToMenuButton2ActionPerformed
-        new MenuScreen().setVisible(true);  //will return to the main menu and dispose of current screen
-        dispose();
+        Controller.backButton(this); //will return to the main menu and dispose of current screen   
     }//GEN-LAST:event_backToMenuButton2ActionPerformed
 
     //if customer wants to withdraw custom amount
