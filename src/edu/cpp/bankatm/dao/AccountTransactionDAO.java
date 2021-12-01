@@ -25,20 +25,28 @@ public class AccountTransactionDAO {
      * */
     public void create() {
         try {
+            var txDate = new java.sql.Date(dateTime.getTime());
             PreparedStatement preparedStatement = DB.getConnection().prepareStatement("INSERT INTO AccountTransaction (`Amount`, `Datetime`) VALUES (?,?)");
             preparedStatement.setInt(1, amount);
-            preparedStatement.setDate(2, new java.sql.Date(dateTime.getTime()));
-            preparedStatement.execute();
-            this.transactionID = preparedStatement.getResultSet().getInt("TransactionID");
-            preparedStatement.close();
+            preparedStatement.setDate(2, txDate);
+            preparedStatement.executeUpdate();
+            PreparedStatement preparedStatement2 = DB.getConnection().prepareStatement("SELECT TransactionID FROM AccountTransaction WHERE `Amount` = ? AND `Datetime` = ?");
+            preparedStatement2.setInt(1, amount);
+            preparedStatement2.setDate(2, txDate);
+            preparedStatement2.execute();
+            var resultSet = preparedStatement2.getResultSet();
+            if (resultSet.next()) {
+                this.transactionID = resultSet.getInt("TransactionID");
+                preparedStatement.close();
 
-            preparedStatement = DB.getConnection().prepareStatement("INSERT INTO TransactionDetails (`TransactionID`, `toAccountID`, `fromAccountID`) VALUES (?,?,?)");
-            preparedStatement.setInt(1, transactionID);
-            preparedStatement.setInt(2, toAccount);
-            preparedStatement.setInt(3, fromAccount);
-            preparedStatement.execute();
-            preparedStatement.close();
-
+                preparedStatement = DB.getConnection().prepareStatement("INSERT INTO TransactionDetails (`TransactionID`, `toAccountID`, `fromAccountID`) VALUES (?,?,?)");
+                preparedStatement.setInt(1, transactionID);
+                preparedStatement.setInt(2, toAccount);
+                preparedStatement.setInt(3, fromAccount);
+                preparedStatement.executeUpdate();
+                preparedStatement.close();
+            }
+            preparedStatement2.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -110,12 +118,12 @@ public class AccountTransactionDAO {
         try {
             PreparedStatement preparedStatement = DB.getConnection().prepareStatement("DELETE FROM AccountTransaction WHERE TransactionID = ?");
             preparedStatement.setInt(1, transactionID);
-            preparedStatement.execute();
+            preparedStatement.executeUpdate();
             preparedStatement.close();
 
             preparedStatement = DB.getConnection().prepareStatement("DELETE FROM TransactionDetails WHERE TransactionID = ?");
             preparedStatement.setInt(1, transactionID);
-            preparedStatement.execute();
+            preparedStatement.executeUpdate();
             preparedStatement.close();
         } catch (Exception e) {
             e.printStackTrace();

@@ -2,6 +2,7 @@ package edu.cpp.bankatm;
 
 import edu.cpp.bankatm.dao.ATMDAO;
 import edu.cpp.bankatm.dao.AccountDAO;
+import edu.cpp.bankatm.dao.AccountTransactionDAO;
 import edu.cpp.bankatm.dao.DebitCardDAO;
 import edu.cpp.bankatm.gui.*;
 
@@ -38,16 +39,28 @@ public class Controller {
 
 
     public static void deposit(DepositScreen depositScreen) {
+
+        int amount = depositScreen.getOnes()
+                + depositScreen.getFives() * 5
+                + depositScreen.getTens() * 10
+                + depositScreen.getTwenties() * 20
+                + depositScreen.getFifties() * 50
+                + depositScreen.getHundreds() * 100;
+
         // update balance
         activeCard.getAccountDAO().setBalance(
-                activeCard.getAccountDAO().getBalance()
-                        + depositScreen.getOnes()
-                        + depositScreen.getFives() * 5
-                        + depositScreen.getTens() * 10
-                        + depositScreen.getTwenties() * 20
-                        + depositScreen.getFifties() * 50
-                        + depositScreen.getHundreds() * 100
+                activeCard.getAccountDAO().getBalance() + amount
         );
+
+        int to = activeCard.getAccountDAO().getAccountNum();
+        int from = 6;
+        var when = new java.sql.Date(new java.util.Date().getTime());
+        // create transaction
+        var transaction = new AccountTransactionDAO(-1, amount, when);
+        transaction.setFromAccount(from);
+        transaction.setToAccount(to);
+        System.out.printf("create transaction amount:%d to:%d from:%d when:%d%n", amount, to, from, when.getTime());
+        transaction.create();
 
         // add bills to ATM
         thisATM.setOnes(thisATM.getOnes() + depositScreen.getOnes());
@@ -87,17 +100,16 @@ public class Controller {
         withdrawal -= fives * 5;
         int ones = bills(1, withdrawal);
 
-
         // update balance
         activeCard.getAccountDAO().setBalance(
-                activeCard.getAccountDAO().getBalance()
-                        - ones
-                        - fives * 5
-                        - tens * 10
-                        - twenties * 20
-                        - fifties * 50
-                        - hundreds * 100
+                activeCard.getAccountDAO().getBalance() - withdrawal
         );
+
+        // create transaction
+        var transaction = new AccountTransactionDAO(-1, withdrawal, new java.sql.Date(new java.util.Date().getTime()));
+        transaction.setToAccount(5);
+        transaction.setFromAccount(activeCard.getAccountDAO().getAccountNum());
+        transaction.create();
 
         // remove bills from ATM
         thisATM.setOnes(thisATM.getOnes() - ones);
@@ -115,13 +127,22 @@ public class Controller {
     }
 
     public static void withdrawTwenties(int i, FastWithdrawScreen fastWithdrawScreen) {
+
+        int withdrawal = i * 20;
+
         // update balance
         activeCard.getAccountDAO().setBalance(
-                activeCard.getAccountDAO().getBalance() - i * 20
+                activeCard.getAccountDAO().getBalance() - withdrawal
         );
 
         // remove bills from ATM
         thisATM.setTwenties(thisATM.getTwenties() - i);
+
+        // create transaction
+        var transaction = new AccountTransactionDAO(-1, withdrawal, new java.sql.Date(new java.util.Date().getTime()));
+        transaction.setToAccount(5);
+        transaction.setFromAccount(activeCard.getAccountDAO().getAccountNum());
+        transaction.create();
 
         // go back to main menu
         var menu = new MenuScreen();
@@ -141,6 +162,12 @@ public class Controller {
         );
 
         toAccount.setBalance(toAccount.getBalance() + amount);
+
+        // create transaction
+        var transaction = new AccountTransactionDAO(-1, amount, new java.sql.Date(new java.util.Date().getTime()));
+        transaction.setToAccount(transferFundsScreen.getTransferToAccountNumber());
+        transaction.setFromAccount(activeCard.getAccountDAO().getAccountNum());
+        transaction.create();
 
         // go back to main menu
         var menu = new MenuScreen();
@@ -170,7 +197,7 @@ public class Controller {
         var menu = new MenuScreen();
         menu.setAccountBalance(activeCard.getAccountDAO().getBalance());
         menu.setVisible(true);
-        customWithdrawalScreen.dispose();   
+        customWithdrawalScreen.dispose();
     }
 
     public static void backButton(TransferFundsScreen transferFundsScreen) {
