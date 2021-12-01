@@ -2,6 +2,7 @@ package edu.cpp.bankatm.dao;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -11,9 +12,9 @@ public class AccountTransactionDAO {
     private int toAccount;
     private int fromAccount;
     private int amount;
-    private Date dateTime;
+    private Timestamp dateTime;
 
-    public AccountTransactionDAO(int transactionID, int amount, Date dateTime) {
+    public AccountTransactionDAO(int transactionID, int amount, Timestamp dateTime) {
         this.transactionID = transactionID;
         this.amount = amount;
         this.dateTime = dateTime;
@@ -25,14 +26,12 @@ public class AccountTransactionDAO {
      * */
     public void create() {
         try {
-            var txDate = new java.sql.Date(dateTime.getTime());
+            var txDate = new java.sql.Timestamp(dateTime.getTime());
             PreparedStatement preparedStatement = DB.getConnection().prepareStatement("INSERT INTO AccountTransaction (`Amount`, `Datetime`) VALUES (?,?)");
             preparedStatement.setInt(1, amount);
-            preparedStatement.setDate(2, txDate);
+            preparedStatement.setTimestamp(2, txDate);
             preparedStatement.executeUpdate();
-            PreparedStatement preparedStatement2 = DB.getConnection().prepareStatement("SELECT TransactionID FROM AccountTransaction WHERE `Amount` = ? AND `Datetime` = ?");
-            preparedStatement2.setInt(1, amount);
-            preparedStatement2.setDate(2, txDate);
+            PreparedStatement preparedStatement2 = DB.getConnection().prepareStatement("SELECT TransactionID FROM AccountTransaction ORDER BY TransactionID DESC LIMIT 1");
             preparedStatement2.execute();
             var resultSet = preparedStatement2.getResultSet();
             if (resultSet.next()) {
@@ -43,10 +42,10 @@ public class AccountTransactionDAO {
                 preparedStatement.setInt(1, transactionID);
                 preparedStatement.setInt(2, toAccount);
                 preparedStatement.setInt(3, fromAccount);
-                preparedStatement.executeUpdate();
-                preparedStatement.close();
             }
+            resultSet.close();
             preparedStatement2.close();
+            preparedStatement.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -62,7 +61,7 @@ public class AccountTransactionDAO {
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
                 int Amount = resultSet.getInt("Amount");
-                Date DateTime = new java.util.Date(resultSet.getDate("Datetime").getTime());
+                Timestamp DateTime = new java.sql.Timestamp(resultSet.getTimestamp("Datetime").getTime());
                 preparedStatement.close();
                 resultSet.close();
                 AccountTransactionDAO accountTransactionDAO = new AccountTransactionDAO(transactionID, Amount, DateTime);
@@ -95,7 +94,7 @@ public class AccountTransactionDAO {
         try {
             PreparedStatement preparedStatement = DB.getConnection().prepareStatement("UPDATE AccountTransaction SET `Amount` = ?, `Datetime` = ? WHERE `TransactionID` = ?");
             preparedStatement.setInt(1, amount);
-            preparedStatement.setDate(2, new java.sql.Date(dateTime.getTime()));
+            preparedStatement.setTimestamp(2, new java.sql.Timestamp(dateTime.getTime()));
             preparedStatement.setInt(3, transactionID);
             preparedStatement.executeUpdate();
             preparedStatement.close();
@@ -194,7 +193,7 @@ public class AccountTransactionDAO {
         return dateTime;
     }
 
-    public void setDateTime(Date dateTime) {
+    public void setDateTime(Timestamp dateTime) {
         this.dateTime = dateTime;
         update();
     }

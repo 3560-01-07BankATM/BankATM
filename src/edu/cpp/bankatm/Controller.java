@@ -54,12 +54,11 @@ public class Controller {
 
         int to = activeCard.getAccountDAO().getAccountNum();
         int from = 6;
-        var when = new java.sql.Date(new java.util.Date().getTime());
+        var when = new java.sql.Timestamp(new java.util.Date().getTime());
         // create transaction
         var transaction = new AccountTransactionDAO(-1, amount, when);
         transaction.setFromAccount(from);
         transaction.setToAccount(to);
-        System.out.printf("create transaction amount:%d to:%d from:%d when:%d%n", amount, to, from, when.getTime());
         transaction.create();
 
         // add bills to ATM
@@ -106,7 +105,7 @@ public class Controller {
         );
 
         // create transaction
-        var transaction = new AccountTransactionDAO(-1, withdrawal, new java.sql.Date(new java.util.Date().getTime()));
+        var transaction = new AccountTransactionDAO(-1, withdrawal, new java.sql.Timestamp(new java.util.Date().getTime()));
         transaction.setToAccount(5);
         transaction.setFromAccount(activeCard.getAccountDAO().getAccountNum());
         transaction.create();
@@ -139,7 +138,7 @@ public class Controller {
         thisATM.setTwenties(thisATM.getTwenties() - i);
 
         // create transaction
-        var transaction = new AccountTransactionDAO(-1, withdrawal, new java.sql.Date(new java.util.Date().getTime()));
+        var transaction = new AccountTransactionDAO(-1, withdrawal, new java.sql.Timestamp(new java.util.Date().getTime()));
         transaction.setToAccount(5);
         transaction.setFromAccount(activeCard.getAccountDAO().getAccountNum());
         transaction.create();
@@ -164,7 +163,7 @@ public class Controller {
         toAccount.setBalance(toAccount.getBalance() + amount);
 
         // create transaction
-        var transaction = new AccountTransactionDAO(-1, amount, new java.sql.Date(new java.util.Date().getTime()));
+        var transaction = new AccountTransactionDAO(-1, amount, new java.sql.Timestamp(new java.util.Date().getTime()));
         transaction.setToAccount(transferFundsScreen.getTransferToAccountNumber());
         transaction.setFromAccount(activeCard.getAccountDAO().getAccountNum());
         transaction.create();
